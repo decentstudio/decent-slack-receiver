@@ -33,9 +33,7 @@ router.post('/', (req, res) => {
     res.send(req.body.challenge);
   }
 
-  // Verify that the request is coming from slack by making sure
-  // the token sent is the same as our app token
-  // Comment this out if testing without using Slack
+  // Verify that the request is coming from slack
   if (req.body.token !== "NzZYknIbrEjXjfqusU3Htxn5") {
     res.status(400);
     res.send("Access denied.");
@@ -54,15 +52,13 @@ router.post('/', (req, res) => {
 
 // Endpoint for slash commands
 router.post('/command', (req, res) => {
-  // Verify that the request is coming from slack by making sure
-  // the token sent is the same as our app token
-  // Comment this out if testing without using Slack
+  // Verify that the request is coming from slack
   if (req.body.token !== "NzZYknIbrEjXjfqusU3Htxn5") {
     res.status(400);
     res.send("Access denied.");
   }
 
-  if (!isValidCommand(req.body)) {
+  if (!commandValidator.isValid(req.body)) {
     res.send({
       'response_type': 'ephemeral',
       'text': 'Sorry, that is not a valid command'
