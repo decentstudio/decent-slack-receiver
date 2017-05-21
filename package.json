@@ -6,7 +6,8 @@
     "body-parser": "~1.0.1",
     "dotenv": "^4.0.0",
     "express": "~4.0.0",
-    "immutable": "^3.8.1"
+    "immutable": "^3.8.1",
+    "npmlog": "^4.1.0"
   },
   "scripts": {
     "start": "node server.js"
