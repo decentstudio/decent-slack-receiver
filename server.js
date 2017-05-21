@@ -4,11 +4,11 @@
 // =============================================================================
 
 // call the packages we need
+const dotenv = require('dotenv').config();
 const express = require('express');        // call express
 const app = express();                 // define our app using express
 const bodyParser = require('body-parser');
 const http = require('http');
-const commandValidator = require('./command/command-validator');
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -16,6 +16,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 const port = process.env.PORT || 8080;        // set our port
+
+const SLACK_VERIFICATION_TOKEN = process.env.SLACK_VERIFICATION_TOKEN;
 
 // ROUTES FOR OUR API
 // =============================================================================
@@ -34,7 +36,7 @@ router.post('/', (req, res) => {
   }
 
   // Verify that the request is coming from slack
-  if (req.body.token !== "NzZYknIbrEjXjfqusU3Htxn5") {
+  if (req.body.token !== SLACK_VERIFICATION_TOKEN) {
     res.status(400);
     res.send("Access denied.");
   }
@@ -53,16 +55,9 @@ router.post('/', (req, res) => {
 // Endpoint for slash commands
 router.post('/command', (req, res) => {
   // Verify that the request is coming from slack
-  if (req.body.token !== "NzZYknIbrEjXjfqusU3Htxn5") {
+  if (req.body.token !== SLACK_VERIFICATION_TOKEN) {
     res.status(400);
     res.send("Access denied.");
-  }
-
-  if (!commandValidator.isValid(req.body)) {
-    res.send({
-      'response_type': 'ephemeral',
-      'text': 'Sorry, that is not a valid command'
-    });
   }
 
   // Respond immediately so the user knows command was received
@@ -72,6 +67,8 @@ router.post('/command', (req, res) => {
     'text': 'Command received! One moment...'
   });
   console.log(req.body);
+
+  // Send request to queue
 });
 
 // more routes for our API will happen here
