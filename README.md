@@ -11,8 +11,11 @@ This API will be a single point of entry for events coming from slack.
 
 3. Build
    - `npm run build`
+   
+4. Environment Variables
+   - Create a .env file based on the .env.example file
 
-4. Start
+5. Start
    - `npm start`
 
 ## Docker Usage
