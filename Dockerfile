@@ -13,8 +13,8 @@ COPY . app/
 
 WORKDIR /app
 
-RUN npm install
+RUN npm install && npm run build
 
 EXPOSE 8080
 
-ENTRYPOINT ["node", "server.js"]
+ENTRYPOINT ["npm", "start"]

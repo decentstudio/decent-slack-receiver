@@ -2,6 +2,19 @@
 
 This API will be a single point of entry for events coming from slack.
 
+## Run project
+
+1. Navigate to the project directory
+
+2. Install dependencies
+   - `npm install`
+
+3. Build
+   - `npm run build`
+
+4. Start
+   - `npm start`
+
 ## Docker Usage
 ### Ubuntu 16.04 	
 
@@ -20,3 +33,5 @@ This API will be a single point of entry for events coming from slack.
 Make a file called .env in the root of the project, if you have not already. Add the following required environment variables, along with their values. Follow the .env.example file if needed.
 
 - SLACK_VERIFICATION_TOKEN
+
+- HTTP_PORT
