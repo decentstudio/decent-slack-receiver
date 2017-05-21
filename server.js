@@ -9,6 +9,9 @@ const express = require('express');        // call express
 const app = express();                 // define our app using express
 const bodyParser = require('body-parser');
 const http = require('http');
+const amqplib = require('amqplib');
+const { Map } = require('immutable');
+const log = require('npmlog');
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -18,6 +21,45 @@ app.use(bodyParser.json());
 const port = process.env.PORT || 8080;        // set our port
 
 const SLACK_VERIFICATION_TOKEN = process.env.SLACK_VERIFICATION_TOKEN;
+
+/************
+ * RabbitMQ *
+ ************/
+
+// This function accepts an AMQP config and returns an AMQP connection URL.
+//
+// Map config: {user: string,
+//              pass: string,
+//              host: string,
+//              port: string,
+//              vhost: string}
+//
+function getAMQPUrl (config) {
+  return "amqp://"
+          + config.get('user')
+          + ':'
+          + config.get('pass')
+          + '@'
+          + config.get('host')
+          + ':'
+          + config.get('port')
+          + config.get('vhost');
+}
+
+let amqpConfig = Map({host: process.env.RABBITMQ_HOST,
+                      port: process.env.RABBITMQ_PORT,
+                      user: process.env.RABBITMQ_USER,
+                      pass: process.env.RABBITMQ_PASS,
+                      vhost: process.env.RABBITMQ_VHOST}),
+    amqpURL = getAMQPUrl(amqpConfig);
+
+amqplib.connect(amqpURL).then(
+  (conn) => {
+    log.info('amqp', 'Connected to Broker');
+  },
+  (err) => {
+    log.error('amqp', ' Connection Error\n', 'Message: ' + err.message);
+  });
 
 // ROUTES FOR OUR API
 // =============================================================================
