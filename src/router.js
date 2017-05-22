@@ -10,16 +10,16 @@ const router = express.Router(),
 //////////////////////////
 
 function wrapLogRequestBody (req, res, next) {
-  log.info('router', "Request Body: " + req.body);
+  log.info('router', req.body);
   next();
 }
 
 function wrapAuthorizeSlack (req, res, next) {
   if (req.body.token === slackVerificationToken) {
     next();
+    return;
   }
-  res.status(400);
-  res.send("Access denied.");
+  res.status(400).send("Access denied.");
 }
 
 router.all('*', wrapLogRequestBody, wrapAuthorizeSlack);
@@ -39,13 +39,13 @@ router.get('/', (req, res) => {
 function wrapVerifyEndpoint (req, res, next) {
   if (req.body.type !== "url_verification") {
     next();
+    return;
   }
   res.send(req.body.challenge);
 }
 
 function eventHandler (req, res) {
-  res.status(200);
-  res.send();
+  res.status(200).end();
 }
 
 router.post('/event', wrapVerifyEndpoint, eventHandler);
