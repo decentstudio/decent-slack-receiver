@@ -5,79 +5,32 @@
 
 // call the packages we need
 import * as config from './config';
+import router from './router';
+import * as bodyParser from 'body-parser';
+import * as http from 'http';
+import * as log from 'npmlog';
 
-const express = require('express');        // call express
-const app = express();                 // define our app using express
-const bodyParser = require('body-parser');
-const http = require('http');
+const express = require('express');
 
-// configure app to use bodyParser()
-// this will let us get the data from a POST
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+const httpPort = config.HTTP_PORT;
 
-const HTTP_PORT = config.HTTP_PORT;
-const SLACK_VERIFICATION_TOKEN = config.SLACK_VERIFICATION_TOKEN;
+const wrapParseUrlEncodedBody = bodyParser.urlencoded({ extended: true });
+const wrapParseJsonBody = bodyParser.json();
 
-// ROUTES FOR OUR API
-// =============================================================================
-const router = express.Router();              // get an instance of the express Router
+const app = express();
 
-// test route to make sure everything is working (accessed at GET http://localhost:8080/api)
-router.get('/', (req, res) => {
-  res.json({ message: 'hooray! welcome to our api!' });
-});
+app.all('*', wrapParseUrlEncodedBody, wrapParseJsonBody);
 
-// Endpoint for events
-router.post('/', (req, res) => {
-  // URL verification required for the Slack Events API
-  if (req.body.type === "url_verification") {
-    res.send(req.body.challenge);
-  }
-
-  // Verify that the request is coming from slack
-  if (req.body.token !== SLACK_VERIFICATION_TOKEN) {
-    res.status(400);
-    res.send("Access denied.");
-  }
-
-  console.log(req.body);
-
-  // We must immediately (within 2 seconds) send a 200 response
-  // or else Slack will retry the message
-  res.status(200);
-  res.send();
-
-  // Send the event on to the event receiver
-
-});
-
-// Endpoint for slash commands
-router.post('/command', (req, res) => {
-  // Verify that the request is coming from slack
-  if (req.body.token !== SLACK_VERIFICATION_TOKEN) {
-    res.status(400);
-    res.send("Access denied.");
-  }
-
-  // Respond immediately so the user knows command was received
-  res.status(200);
-  res.json({
-    'response_type': 'ephemeral',
-    'text': 'Command received! One moment...'
-  });
-  console.log(req.body);
-
-  // Send request to queue
-});
-
-// more routes for our API will happen here
-
-// REGISTER OUR ROUTES -------------------------------
-// all of our routes will be prefixed with /api
 app.use('/api', router);
 
-// START THE SERVER
-// =============================================================================
-app.listen(HTTP_PORT);
-console.log('Magic happens on port ' + HTTP_PORT);
+function onStart (port, app, err) {
+  if (!err) {
+    const template = `Magic happens on port ${port}`;
+    log.info('server', template);
+  }
+  else {
+    log.error('server', err);
+  }
+}
+
+app.listen(httpPort, (app, err) => { onStart(httpPort, app, err) });
