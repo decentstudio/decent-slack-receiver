@@ -4,7 +4,8 @@
 // =============================================================================
 
 // call the packages we need
-const dotenv = require('dotenv').config();
+import * as config from './config';
+
 const express = require('express');        // call express
 const app = express();                 // define our app using express
 const bodyParser = require('body-parser');
@@ -15,9 +16,8 @@ const http = require('http');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-const port = process.env.PORT || 8080;        // set our port
-
-const SLACK_VERIFICATION_TOKEN = process.env.SLACK_VERIFICATION_TOKEN;
+const HTTP_PORT = config.HTTP_PORT;
+const SLACK_VERIFICATION_TOKEN = config.SLACK_VERIFICATION_TOKEN;
 
 // ROUTES FOR OUR API
 // =============================================================================
@@ -79,5 +79,5 @@ app.use('/api', router);
 
 // START THE SERVER
 // =============================================================================
-app.listen(port);
-console.log('Magic happens on port ' + port);
+app.listen(HTTP_PORT);
+console.log('Magic happens on port ' + HTTP_PORT);
