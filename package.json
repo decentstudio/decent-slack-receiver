@@ -12,7 +12,7 @@
   "scripts": {
     "build": "babel src -d lib",
     "start": "node lib/server.js",
-    "test":"./node_modules/mocha/bin/mocha --recursive"
+    "test": "./node_modules/mocha/bin/mocha --recursive"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
