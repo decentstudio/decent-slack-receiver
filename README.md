@@ -11,7 +11,7 @@ This API will be a single point of entry for events coming from slack.
 
 3. Build
    - `npm run build`
-   
+
 4. Environment Variables
    - Create a .env file based on the .env.example file
 
@@ -29,7 +29,7 @@ This API will be a single point of entry for events coming from slack.
    - `sudo docker build -t decent-event-receiver:1.0 .`
 
 4. Run the container:
-   - `sudo docker run -d -p 8080:8080 --env-file=.env decent-event-receiver:1.0`
+   - `sudo docker run -d --net=host --env-file=.env decent-event-receiver:1.0`
 
 ## Environment Variables Setup
 
