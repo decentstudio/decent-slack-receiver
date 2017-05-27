@@ -38,3 +38,13 @@ Make a file called .env in the root of the project, if you have not already. Add
 - SLACK_VERIFICATION_TOKEN
 
 - HTTP_PORT
+
+- RABBITMQ_HOST
+
+- RABBITMQ_PORT
+
+- RABBITMQ_USER
+
+- RABBITMQ_PASS
+
+- RABBITMQ_VHOST
