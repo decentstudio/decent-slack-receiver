@@ -1,9 +1,12 @@
-import * as express from 'express'
-import * as log from 'npmlog'
-import * as config from './config'
+import * as express from 'express';
+import * as log from 'npmlog';
+import * as config from './config';
+import * as bodyParser from 'body-parser';
 
 const router = express.Router(),
-      slackVerificationToken = config.SLACK_VERIFICATION_TOKEN;
+      slackVerificationToken = config.SLACK_VERIFICATION_TOKEN,
+      wrapParseUrlEncodedBody = bodyParser.urlencoded({ extended: true }),
+      wrapParseJsonBody = bodyParser.json();
 
 //////////////////////////
 // Universal Middleware //
@@ -22,16 +25,12 @@ function wrapAuthorizeSlack (req, res, next) {
   res.status(400).send("Access denied.");
 }
 
-router.all('*', wrapLogRequestBody, wrapAuthorizeSlack);
-
-//////////
-// Root //
-//////////
-
-router.get('/', (req, res) => {
-  res.json({ message: 'hooray! welcome to our api!' });
-});
-
+router.all('*',
+  wrapParseJsonBody,
+  wrapParseUrlEncodedBody,
+  wrapLogRequestBody, 
+  wrapAuthorizeSlack);
+  
 ////////////
 // Events //
 ////////////
@@ -45,6 +44,7 @@ function wrapVerifyEndpoint (req, res, next) {
 }
 
 function eventHandler (req, res) {
+  req.broker.publish('decent.slack.event', req.body);
   res.status(200).end();
 }
 
@@ -55,6 +55,7 @@ router.post('/event', wrapVerifyEndpoint, eventHandler);
 //////////////
 
 function commandHandler (req, res) {
+  req.broker.publish('decent.slack.command', req.body);
   res.status(200);
   res.json({
     'response_type': 'ephemeral',
