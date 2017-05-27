@@ -16,6 +16,23 @@ let logConnectionAttempt = (config) => {
   return config;
 }
 
-export function getConnection (config) {
-  return amqplib.connect(getConnectionUrl(logConnectionAttempt(config)));
+function publish (channel, exchange, routingKey, payload, options) {
+ return channel.publish(exchange, routingKey, payload, options);
+}
+
+export function connect () {
+  return new Promise((resolve, reject) => {
+    let config = {host: process.env.RABBITMQ_HOST,
+                  port: process.env.RABBITMQ_PORT,
+		  user: process.env.RABBITMQ_USER,
+		  pass: process.env.RABBITMQ_PASS,
+		  vhost: process.env.RABBITMQ_VHOST};
+
+     amqplib.connect(getConnectionUrl(logConnectionAttempt(config))).then(
+       (conn) => {
+         return conn.createChannel();
+       }).then((channel) => {
+           resolve({publish: publish.bind(null, channel, 'amq.topic')});
+       });
+  });
 }

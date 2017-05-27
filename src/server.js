@@ -16,11 +16,16 @@ const express = require('express');
 const httpPort = config.HTTP_PORT;
 
 broker.connect().then(
-  (connection) => {
+  (broker) => {
     let app = express();
 
     app.get('/', (req, res) => {
       res.json({ message: 'hooray! welcome to our api!' });
+    });
+
+    app.use('*', (req, res, next) => {
+      req.broker = broker;
+      next();
     });
 
     app.use('/api', router);
