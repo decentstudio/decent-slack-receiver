@@ -16,8 +16,19 @@ let logConnectionAttempt = (config) => {
   return config;
 }
 
+/* 
+* This function publishes a message to an AMQP broker.
+*
+* `channel`: An AMQP channel object.
+* `exchange`: Name of the target exchange as a string.
+* `routingKey`: The routing key for the message as a string.
+* `payload`: A JavaScript object.
+* `options`: An object containing AMQP publish options.
+*
+*/ 
 function publish (channel, exchange, routingKey, payload, options) {
- return channel.publish(exchange, routingKey, payload, options);
+ let bufferedPayload = Buffer.from(JSON.stringify(payload));
+ return channel.publish(exchange, routingKey, bufferedPayload, options);
 }
 
 export function connect () {

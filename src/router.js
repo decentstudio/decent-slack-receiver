@@ -8,10 +8,6 @@ const router = express.Router(),
       wrapParseUrlEncodedBody = bodyParser.urlencoded({ extended: true }),
       wrapParseJsonBody = bodyParser.json();
 
-function toBuffer(obj) {
- return Buffer.from(JSON.stringify(obj));
-}
-
 //////////////////////////
 // Universal Middleware //
 //////////////////////////
@@ -48,7 +44,7 @@ function wrapVerifyEndpoint (req, res, next) {
 }
 
 function eventHandler (req, res) {
-  req.broker.publish('decent.slack.event', toBuffer(req.body));
+  req.broker.publish('decent.slack.event', req.body);
   res.status(200).end();
 }
 
@@ -59,7 +55,7 @@ router.post('/event', wrapVerifyEndpoint, eventHandler);
 //////////////
 
 function commandHandler (req, res) {
-  req.broker.publish('decent.slack.command', toBuffer(req.body));
+  req.broker.publish('decent.slack.command', req.body);
   res.status(200);
   res.json({
     'response_type': 'ephemeral',
