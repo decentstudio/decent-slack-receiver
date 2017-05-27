@@ -18,7 +18,7 @@ This API will be a single point of entry for events coming from slack.
 5. Start
    - `npm start`
 
-## Docker Usage
+## Docker Usage (Development)
 ### Ubuntu 16.04 	
 
 1. Navigate to the project directory
@@ -26,10 +26,14 @@ This API will be a single point of entry for events coming from slack.
 2. Create a `.env` file based on the `.env.example` file
 
 3. Build the container:
-   - `sudo docker build -t decent-event-receiver:1.0 .`
+   - `docker build -t decent-event-receiver:1.0 .`
 
 4. Run the container:
-   - `sudo docker run -d --net=host --env-file=.env decent-event-receiver:1.0`
+   - `docker run -d --net=host --env-file=.env decent-event-receiver:1.0`
+
+Note:
+
+On Windows 10 Pro we have seen that sometimes a `--hostname=localhost` flag is necessary in step 4 above.
 
 ## Environment Variables Setup
 
