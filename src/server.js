@@ -5,6 +5,7 @@
 
 // call the packages we need
 import * as config from './config';
+import * as broker from './broker';
 import router from './router';
 import * as bodyParser from 'body-parser';
 import * as http from 'http';
@@ -14,14 +15,18 @@ const express = require('express');
 
 const httpPort = config.HTTP_PORT;
 
-const wrapParseUrlEncodedBody = bodyParser.urlencoded({ extended: true });
-const wrapParseJsonBody = bodyParser.json();
+broker.connect().then(
+  (connection) => {
+    let app = express();
 
-const app = express();
+    app.get('/', (req, res) => {
+      res.json({ message: 'hooray! welcome to our api!' });
+    });
 
-app.all('*', wrapParseUrlEncodedBody, wrapParseJsonBody);
+    app.use('/api', router);
 
-app.use('/api', router);
+    app.listen(httpPort, (app, err) => { onStart(httpPort, app, err) });
+  });
 
 function onStart (port, app, err) {
   if (!err) {
@@ -33,4 +38,4 @@ function onStart (port, app, err) {
   }
 }
 
-app.listen(httpPort, (app, err) => { onStart(httpPort, app, err) });
+

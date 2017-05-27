@@ -1,9 +1,12 @@
-import * as express from 'express'
-import * as log from 'npmlog'
-import * as config from './config'
+import * as express from 'express';
+import * as log from 'npmlog';
+import * as config from './config';
+import * as bodyParser from 'body-parser';
 
 const router = express.Router(),
-      slackVerificationToken = config.SLACK_VERIFICATION_TOKEN;
+      slackVerificationToken = config.SLACK_VERIFICATION_TOKEN,
+      wrapParseUrlEncodedBody = bodyParser.urlencoded({ extended: true }),
+      wrapParseJsonBody = bodyParser.json();
 
 //////////////////////////
 // Universal Middleware //
@@ -22,16 +25,13 @@ function wrapAuthorizeSlack (req, res, next) {
   res.status(400).send("Access denied.");
 }
 
-router.all('*', wrapLogRequestBody, wrapAuthorizeSlack);
-
-//////////
-// Root //
-//////////
-
-router.get('/', (req, res) => {
-  res.json({ message: 'hooray! welcome to our api!' });
-});
-
+router.all('*',
+  wrapParseJsonBody,
+  wrapParseUrlEncodedBody,
+  wrapLogRequestBody, 
+  wrapAuthorizeSlack, 
+  (req, res, next) => { console.log('yo'); next(); });
+  
 ////////////
 // Events //
 ////////////
