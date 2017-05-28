@@ -1,0 +1,12 @@
+version: "3"
+services:
+  decent-slack-receiver:
+    depends_on:
+      - rabbitmq
+    env_file:
+      - .env
+    build: .
+    ports:
+      - "8080:8080"
+  rabbitmq:
+    image: "rabbitmq:management-alpine"
