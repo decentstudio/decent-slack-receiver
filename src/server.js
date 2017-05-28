@@ -13,7 +13,7 @@ import * as log from 'npmlog';
 
 const express = require('express');
 
-const httpPort = config.HTTP_PORT;
+const httpPort = 80;
 
 broker.connect().then(
   (broker) => {
@@ -42,5 +42,3 @@ function onStart (port, app, err) {
     log.error('server', err);
   }
 }
-
-
