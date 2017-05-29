@@ -28,9 +28,9 @@ function wrapAuthorizeSlack (req, res, next) {
 router.all('*',
   wrapParseJsonBody,
   wrapParseUrlEncodedBody,
-  wrapLogRequestBody, 
+  wrapLogRequestBody,
   wrapAuthorizeSlack);
-  
+
 ////////////
 // Events //
 ////////////
@@ -44,7 +44,7 @@ function wrapVerifyEndpoint (req, res, next) {
 }
 
 function eventHandler (req, res) {
-  req.broker.publish('decent.slack.event', req.body);
+  req.broker.publish(`slack.event.${req.body.event.type}`, req.body);
   res.status(200).end();
 }
 
@@ -55,7 +55,7 @@ router.post('/event', wrapVerifyEndpoint, eventHandler);
 //////////////
 
 function commandHandler (req, res) {
-  req.broker.publish('decent.slack.command', req.body);
+  req.broker.publish('slack.command', req.body);
   res.status(200);
   res.json({
     'response_type': 'ephemeral',
