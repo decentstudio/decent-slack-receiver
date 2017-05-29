@@ -42,10 +42,6 @@ This API will be a single point of entry for events coming from slack.
 4. Run the container:
    - `docker run --name=decent-slack-receiver -d -p 8080:80 --env-file=.env decent-event-receiver:1.0`
 
-Note:
-
-On Windows 10 Pro we have seen that sometimes a `--hostname=localhost` flag is necessary in step 4 above.
-
 ## Environment Variables Setup
 
 Make a file called .env in the root of the project, if you have not already. Add the following required environment variables, along with their values. Follow the .env.example file if needed.
