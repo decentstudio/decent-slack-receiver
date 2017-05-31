@@ -22,7 +22,7 @@ function wrapAuthorizeSlack (req, res, next) {
     next();
     return;
   }
-  res.status(400).send("Access denied.");
+  res.status(400).send('Access denied.');
 }
 
 router.all('*',
@@ -36,7 +36,7 @@ router.all('*',
 ////////////
 
 function wrapVerifyEndpoint (req, res, next) {
-  if (req.body.type !== "url_verification") {
+  if (req.body.type !== 'url_verification') {
     next();
     return;
   }
