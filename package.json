@@ -13,8 +13,7 @@
   },
   "scripts": {
     "build": "babel src -d dist",
-    "start": "node dist/server.js",
-    "build-start": "npm run build && npm run start",
+    "start": "npm run build && node dist/server.js",
     "test": "babel-node test/run-tests.js",
     "lint": "eslint --ext js --ext jsx src || exit 0"
   },

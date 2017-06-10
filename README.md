@@ -9,13 +9,10 @@ This API will be a single point of entry for events coming from slack.
 2. Install dependencies
    - `npm install`
 
-3. Build
-   - `npm run build`
-
-4. Environment Variables
+3. Environment Variables
    - Create a .env file based on the .env.example file
 
-5. Start
+4. Start
    - `npm start`
 
 
@@ -47,6 +44,12 @@ This API will be a single point of entry for events coming from slack.
 Make a file called .env in the root of the project, if you have not already. Add the following required environment variables, along with their values. Follow the .env.example file if needed.
 
 - SLACK_VERIFICATION_TOKEN
+
+- SLACK_CLIENT_ID
+
+- SLACK_CLIENT_SECRET
+
+- HTTP_PORT (set this to 80 for now)
 
 - RABBITMQ_HOST
 
