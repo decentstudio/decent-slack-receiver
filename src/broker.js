@@ -1,17 +1,17 @@
-import * as amqplib from 'amqplib'
-import * as log from 'npmlog'
+import amqplib from 'amqplib'
+import log from 'npmlog'
 
-let getConnectionUrl = ({user, pass, host, port, vhost}) => {
+function getConnectionUrl({ user, pass, host, port, vhost }) {
   return `amqp://${user}:${pass}@${host}:${port}${vhost}`;
 };
 
-let getLogUrl = ({user, host, port, vhost}) => {
+function getLogUrl({ user, host, port, vhost }) {
   return `amqp://${user}:*****@${host}:${port}${vhost}`;
 }
 
-let logConnectionAttempt = (config) => {
+function logConnectionAttempt(config) {
   let logUrl = getLogUrl(config),
-      template = `Connecting to the broker @ ${logUrl}`;
+    template = `Connecting to the broker @ ${logUrl}`;
   log.info('broker', template);
   return config;
 }
@@ -25,25 +25,33 @@ let logConnectionAttempt = (config) => {
 * `payload`: A JavaScript object.
 * `options`: An object containing AMQP publish options.
 *
-*/ 
-function publish (channel, exchange, routingKey, payload, options) {
- let bufferedPayload = Buffer.from(JSON.stringify(payload));
- return channel.publish(exchange, routingKey, bufferedPayload, options);
+*/
+function publish(channel, exchange, routingKey, payload, options) {
+  let bufferedPayload = Buffer.from(JSON.stringify(payload));
+  return channel.publish(exchange, routingKey, bufferedPayload, options);
 }
 
-export function connect () {
+function connect() {
   return new Promise((resolve, reject) => {
-    let config = {host: process.env.RABBITMQ_HOST,
-                  port: process.env.RABBITMQ_PORT,
-		  user: process.env.RABBITMQ_USER,
-		  pass: process.env.RABBITMQ_PASS,
-		  vhost: process.env.RABBITMQ_VHOST};
+    let config = {
+      host: process.env.RABBITMQ_HOST,
+      port: process.env.RABBITMQ_PORT,
+      user: process.env.RABBITMQ_USER,
+      pass: process.env.RABBITMQ_PASS,
+      vhost: process.env.RABBITMQ_VHOST
+    };
 
-     amqplib.connect(getConnectionUrl(logConnectionAttempt(config))).then(
-       (conn) => {
-         return conn.createChannel();
-       }).then((channel) => {
-           resolve({publish: publish.bind(null, channel, 'amq.topic')});
-       });
+    amqplib.connect(getConnectionUrl(logConnectionAttempt(config))).then(
+      (conn) => {
+        return conn.createChannel();
+      }).then((channel) => {
+        resolve({ publish: publish.bind(null, channel, 'amq.topic') });
+      });
   });
 }
+
+const broker = {
+  connect: connect
+};
+
+export default broker;

@@ -5,9 +5,8 @@
 
 // call the packages we need
 import config from './config';
-import * as broker from './broker';
+import broker from './broker';
 import router from './router';
-import bodyParser from 'body-parser';
 import request from 'request';
 import log from 'npmlog';
 import express from 'express';
@@ -17,6 +16,7 @@ let app = express();
 
 app.get('/authorize', (req, res) => {
   getAuthorizationGrant(req.query.code);
+  res.sendStatus(200);
 });
 
 app.listen(config.HTTP_PORT, (app, err) => { onStart(config.HTTP_PORT, app, err) });
@@ -32,19 +32,19 @@ function getAuthorizationGrant(code) {
     }
   };
   request.post(postConfig, function (error, response, body) {
-    console.log('error:', error);
-    console.log('statusCode:', response && response.statusCode);
+    if (error) {
+      console.error(error);
+    }
     const bodyObject = JSON.parse(body);
-    console.log('body:', bodyObject);
-    startBotListening(bodyObject.bot.bot_access_token);
+    startBotListening(bodyObject.bot.bot_access_token, bodyObject.team_name);
   });
 }
 
-function startBotListening(botAccessToken) {
-  console.log('Bot access token:', botAccessToken);
+function startBotListening(botAccessToken, teamName) {
   const rtm = new RtmClient(botAccessToken);
   rtm.on(RTM_EVENTS.MESSAGE, handleRtmMessage);
   rtm.start();
+  console.log(`Bot listening for incoming messages from ${teamName}`);
 }
 
 function handleRtmMessage(message) {
