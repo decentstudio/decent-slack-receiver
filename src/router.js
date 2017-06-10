@@ -14,7 +14,7 @@ const router = express.Router(),
 
 function wrapLogRequestBody (req, res, next) {
   log.info('router', req.body);
-  next();
+  return;
 }
 
 function wrapAuthorizeSlack (req, res, next) {
@@ -28,8 +28,7 @@ function wrapAuthorizeSlack (req, res, next) {
 router.all('*',
   wrapParseJsonBody,
   wrapParseUrlEncodedBody,
-  wrapLogRequestBody,
-  wrapAuthorizeSlack);
+  wrapLogRequestBody);
 
 ////////////
 // Events //

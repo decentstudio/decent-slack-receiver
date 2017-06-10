@@ -4,36 +4,54 @@
 // =============================================================================
 
 // call the packages we need
-import * as config from './config';
+import config from './config';
 import * as broker from './broker';
 import router from './router';
-import * as bodyParser from 'body-parser';
-import * as http from 'http';
-import * as log from 'npmlog';
+import bodyParser from 'body-parser';
+import request from 'request';
+import log from 'npmlog';
+import express from 'express';
+import { RtmClient, RTM_EVENTS } from '@slack/client';
 
-const express = require('express');
+let app = express();
 
-const httpPort = 80;
+app.get('/authorize', (req, res) => {
+  getAuthorizationGrant(req.query.code);
+});
 
-broker.connect().then(
-  (broker) => {
-    let app = express();
+app.listen(config.HTTP_PORT, (app, err) => { onStart(config.HTTP_PORT, app, err) });
 
-    app.get('/', (req, res) => {
-      res.json({ message: 'hooray! welcome to our api!' });
-    });
-
-    app.use('*', (req, res, next) => {
-      req.broker = broker;
-      next();
-    });
-
-    app.use('/api', router);
-
-    app.listen(httpPort, (app, err) => { onStart(httpPort, app, err) });
+function getAuthorizationGrant(code) {
+  console.log('Getting authorization grant.');
+  const postConfig = {
+    url: 'https://slack.com/api/oauth.access',
+    form: {
+      client_id: config.SLACK_CLIENT_ID,
+      client_secret: config.SLACK_CLIENT_SECRET,
+      code
+    }
+  };
+  request.post(postConfig, function (error, response, body) {
+    console.log('error:', error);
+    console.log('statusCode:', response && response.statusCode);
+    const bodyObject = JSON.parse(body);
+    console.log('body:', bodyObject);
+    startBotListening(bodyObject.bot.bot_access_token);
   });
+}
 
-function onStart (port, app, err) {
+function startBotListening(botAccessToken) {
+  console.log('Bot access token:', botAccessToken);
+  const rtm = new RtmClient(botAccessToken);
+  rtm.on(RTM_EVENTS.MESSAGE, handleRtmMessage);
+  rtm.start();
+}
+
+function handleRtmMessage(message) {
+  console.log('Message:', message);
+}
+
+function onStart(port, app, err) {
   if (!err) {
     const template = `Magic happens on port ${port}`;
     log.info('server', template);
