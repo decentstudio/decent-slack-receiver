@@ -61,5 +61,5 @@ typings/
 .vscode
 
 #build
-
+dist
 
