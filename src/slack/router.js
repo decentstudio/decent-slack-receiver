@@ -10,9 +10,9 @@ const router = express.Router(),
   wrapParseUrlEncodedBody = bodyParser.urlencoded({ extended: true }),
   wrapParseJsonBody = bodyParser.json();
 
-//////////////////////////
-// Universal Middleware //
-//////////////////////////
+/*
+  Slack universal middleware
+*/
 
 function wrapLogRequestBody(req, res, next) {
   log.info('router', req.body);
@@ -76,16 +76,16 @@ router.post('/command', commandHandler);
 
 function authorizationGrantHandler(error, response, body) {
   if (error) {
-    console.error(error);
+    log.error('router', error);
   }
   const bodyObject = JSON.parse(body);
-
+  log.info('router', `A team called ${bodyObject.team_name} just installed the app.`);
   // Do the things we want to do when a team initially installs our app
   bot.startListening(bodyObject.bot.bot_access_token, bodyObject.team_name);
 }
 
 function getAuthorizationGrant(code) {
-  console.log('Getting authorization grant.');
+  log.info('router', 'Getting authorization grant.');
   const postConfig = {
     url: 'https://slack.com/api/oauth.access',
     form: {
@@ -98,7 +98,7 @@ function getAuthorizationGrant(code) {
 }
 
 function authorizationHandler(req, res) {
-  console.log('authorizationHandler called');
+  log.info('router', 'A team is installing the app.');
   if (req.query.code) {
     getAuthorizationGrant(req.query.code);
     res.sendStatus(200);

@@ -11,11 +11,15 @@
     "npmlog": "^4.1.0",
     "request": "^2.81.0"
   },
+  "watch": {
+    "start": "src/**/*.js"
+  },
   "scripts": {
     "build": "babel src -d dist",
     "start": "npm run build && node dist/server.js",
     "test": "babel-node test/run-tests.js",
-    "lint": "eslint --ext js --ext jsx src || exit 0"
+    "lint": "eslint --ext js --ext jsx src || exit 0",
+    "watch": "npm-watch start"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
@@ -25,6 +29,8 @@
     "eslint": "^3.19.0",
     "jasmine": "^2.6.0",
     "jasmine-spec-reporter": "^4.1.0",
+    "nodemon": "^1.11.0",
+    "npm-watch": "^0.1.9",
     "request": "^2.81.0"
   }
 }

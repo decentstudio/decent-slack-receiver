@@ -14,6 +14,7 @@ This API will be a single point of entry for events coming from slack.
 
 4. Start
    - `npm start`
+   - OR, to watch for changes to the code and restart the app automatically, run `npm run watch`
 
 
 ## Docker Compose Usage (Development)

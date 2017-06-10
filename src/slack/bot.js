@@ -1,14 +1,15 @@
 import { RtmClient, RTM_EVENTS } from '@slack/client';
+import log from 'npmlog';
 
 function startListening(botAccessToken, teamName) {
   const rtm = new RtmClient(botAccessToken);
   rtm.on(RTM_EVENTS.MESSAGE, handleRtmMessage);
   rtm.start();
-  console.log(`Bot listening for incoming messages from ${teamName}`);
+  log.info('bot', `Bot listening for incoming messages from ${teamName}...`);
 }
-
+ // testasdasasdasd
 function handleRtmMessage(message) {
-  console.log('Message:', message);
+  log.info('bot', 'Message:', message);
 }
 
 const bot = {
