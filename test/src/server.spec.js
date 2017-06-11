@@ -1,5 +1,6 @@
 import * as request from 'request';
 
+/*
 describe("Server.js", function() {
   describe("Get /", () => {
     it("returns status code 200", (done) => {
@@ -11,3 +12,4 @@ describe("Server.js", function() {
     });
   });
 });
+*/
