@@ -13,8 +13,8 @@ This API will be a single point of entry for events coming from slack.
    - Create a .env file based on the .env.example file
 
 4. Start
-   - `npm start`
-   - OR, to watch for changes to the code and restart the app automatically, run `npm run watch`
+   - `npm run build-start` builds then runs the project
+   - OR, to watch for changes to the code and rebuild/restart the app automatically, run `npm run watch`
 
 
 ## Docker Compose Usage (Development)

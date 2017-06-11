@@ -7,7 +7,7 @@ function startListening(botAccessToken, teamName) {
   rtm.start();
   log.info('bot', `Bot listening for incoming messages from ${teamName}...`);
 }
- // testasdasasdasd
+
 function handleRtmMessage(message) {
   log.info('bot', 'Message:', message);
 }

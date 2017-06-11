@@ -10,15 +10,22 @@ import slackRouter from './slack/router';
 import log from 'npmlog';
 import express from 'express';
 
-let app = express();
+broker.connect().then(broker => {
+  let app = express();
 
-app.get('/', (req, res) => {
-  res.json({ message: 'hooray! welcome to our api!' });
+  app.get('/', (req, res) => {
+    res.json({ message: 'hooray! welcome to our api!' });
+  });
+
+  app.use('*', (req, res, next) => {
+    req.broker = broker;
+    next();
+  });
+
+  app.use('/api/slack', slackRouter);
+
+  app.listen(config.HTTP_PORT, (app, err) => onStart(config.HTTP_PORT, app, err));
 });
-
-app.use('/api/slack', slackRouter);
-
-app.listen(config.HTTP_PORT, (app, err) => { onStart(config.HTTP_PORT, app, err) });
 
 function onStart(port, app, err) {
   if (!err) {
