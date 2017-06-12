@@ -64,3 +64,5 @@ typings/
 lib
 
 dist
+
+package-lock.json
