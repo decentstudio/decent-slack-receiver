@@ -7,7 +7,7 @@ machine:
     RABBITMQ_VHOST: /
   services:
     rabbitmq-server
-  deployment:
-    production:
-      branch: fix-ci
-      commands: ./docker-push.sh
+deployment:
+  production:
+    branch: fix-ci
+    commands: ./docker-push.sh
