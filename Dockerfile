@@ -11,6 +11,8 @@ RUN git clone https://github.com/vishnubob/wait-for-it.git \
     && chmod a+x wait-for-it/wait-for-it.sh                \
     && mv wait-for-it/wait-for-it.sh /usr/local/bin/wait-for-it
 
+RUN adduser -S install-bot
+
 USER install-bot
 
 RUN /bin/su install-bot
