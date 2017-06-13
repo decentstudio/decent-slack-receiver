@@ -1,4 +1,6 @@
 machine:
+  node:
+    version: 8.1.0
   environment:
     RABBITMQ_HOST: localhost
     RABBITMQ_PORT: 5672
