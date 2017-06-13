@@ -13,6 +13,8 @@ RUN git clone https://github.com/vishnubob/wait-for-it.git \
 
 USER install-bot
 
+RUN /bin/su install-bot
+
 WORKDIR /home/install-bot
 
 COPY . app/
