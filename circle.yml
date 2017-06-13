@@ -7,6 +7,7 @@ machine:
     RABBITMQ_VHOST: /
   services:
     rabbitmq-server
+    docker
 deployment:
   production:
     branch: fix-ci
