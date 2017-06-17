@@ -31,7 +31,6 @@ router.use(
 
 function wrapAuthorizeSlack(req, res, next) {
   if (req.body.token === slackVerificationToken) {
-    log.info('router:wrapAuthorizeSlack', 'Incoming token is valid, running next middleware');
     next();
     return;
   }
