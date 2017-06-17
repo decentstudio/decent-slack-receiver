@@ -31,9 +31,11 @@ router.use(
 
 function wrapAuthorizeSlack(req, res, next) {
   if (req.body.token === slackVerificationToken) {
+    log.info('router:wrapAuthorizeSlack', 'Incoming token is valid, running next middleware');
     next();
     return;
   }
+  log.info('router:wrapAuthorizeSlack', 'Verification token invalid. Sending 400 Access denied.');
   res.status(400).send('Access denied.');
 }
 
@@ -81,7 +83,7 @@ function authorizationGrantHandler(error, response, body) {
   const bodyObject = JSON.parse(body);
   log.info('router', `A team called ${bodyObject.team_name} just installed the app.`);
   // Do the things we want to do when a team initially installs our app
-  bot.startListening(bodyObject.bot.bot_access_token, bodyObject.team_name);
+  //bot.startListening(bodyObject.bot.bot_access_token, bodyObject.team_name);
 }
 
 function getAuthorizationGrant(code) {
