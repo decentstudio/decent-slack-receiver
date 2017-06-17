@@ -1,13 +1,4 @@
 import * as request from 'request';
 
-describe("Server.js", function() {
-  describe("Get /", () => {
-    it("returns status code 200", (done) => {
-      request.get(baseUrl, (error, response) => {
-        expect(response.statusCode).toBe(200);
-        expect(JSON.parse(response.body)).toEqual({ message:'hooray! welcome to our api!' });
-        done();
-      });
-    });
-  });
-});
+// insert tests for server here
+// NOTE: broker will need to be mocked so that the tests don't depend on rabbitmq

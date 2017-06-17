@@ -4,36 +4,30 @@
 // =============================================================================
 
 // call the packages we need
-import * as config from './config';
-import * as broker from './broker';
-import router from './router';
-import * as bodyParser from 'body-parser';
-import * as http from 'http';
-import * as log from 'npmlog';
+import config from './config';
+import broker from './broker';
+import slackRouter from './slack/router';
+import log from 'npmlog';
+import express from 'express';
 
-const express = require('express');
+broker.connect().then(broker => {
+  let app = express();
 
-const httpPort = 80;
-
-broker.connect().then(
-  (broker) => {
-    let app = express();
-
-    app.get('/', (req, res) => {
-      res.json({ message: 'hooray! welcome to our api!' });
-    });
-
-    app.use('*', (req, res, next) => {
-      req.broker = broker;
-      next();
-    });
-
-    app.use('/api', router);
-
-    app.listen(httpPort, (app, err) => { onStart(httpPort, app, err) });
+  app.get('/', (req, res) => {
+    res.json({ message: 'hooray! welcome to our api!' });
   });
 
-function onStart (port, app, err) {
+  app.use('*', (req, res, next) => {
+    req.broker = broker;
+    next();
+  });
+
+  app.use('/api/slack', slackRouter);
+
+  app.listen(config.HTTP_PORT, (app, err) => onStart(config.HTTP_PORT, app, err));
+});
+
+function onStart(port, app, err) {
   if (!err) {
     const template = `Magic happens on port ${port}`;
     log.info('server', template);

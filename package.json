@@ -2,18 +2,25 @@
   "name": "decent-slack-endpoint",
   "main": "server.js",
   "dependencies": {
+    "@slack/client": "^3.10.0",
     "amqplib": "^0.5.1",
     "body-parser": "~1.0.1",
     "dotenv": "^4.0.0",
-    "express": "~4.0.0",
+    "express": "^4.15.3",
     "immutable": "^3.8.1",
-    "npmlog": "^4.1.0"
+    "npmlog": "^4.1.0",
+    "request": "^2.81.0"
+  },
+  "watch": {
+    "build-start": "src/**/*.js"
   },
   "scripts": {
     "build": "babel src -d dist",
     "start": "node dist/server.js",
+    "build-start": "npm run build && node dist/server.js",
     "test": "babel-node test/run-tests.js",
-    "lint": "eslint --ext js --ext jsx src || exit 0"
+    "lint": "eslint --ext js --ext jsx src || exit 0",
+    "watch": "npm-watch start"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
@@ -23,6 +30,7 @@
     "eslint": "^3.19.0",
     "jasmine": "^2.6.0",
     "jasmine-spec-reporter": "^4.1.0",
-    "request": "^2.81.0"
+    "nodemon": "^1.11.0",
+    "npm-watch": "^0.1.9"
   }
 }
