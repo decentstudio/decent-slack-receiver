@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Build') {
             agent {
-              docker { 'node:7.4' }
+              docker 'node:7.4'
             }
             steps {
                 echo 'Building..'
