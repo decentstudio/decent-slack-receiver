@@ -8,14 +8,15 @@ import bot from './bot';
 const router = express.Router(),
   slackVerificationToken = config.SLACK_VERIFICATION_TOKEN,
   wrapParseUrlEncodedBody = bodyParser.urlencoded({ extended: true }),
-  wrapParseJsonBody = bodyParser.json();
+  wrapParseJsonBody = bodyParser.json(),
+  logPrefix = 'Slack Router:';
 
 /*
   Slack universal middleware
 */
 
 function wrapLogRequestBody(req, res, next) {
-  log.info('router', req.body);
+  log.info(logPrefix, req.body);
   next();
 }
 
@@ -34,7 +35,7 @@ function wrapAuthorizeSlack(req, res, next) {
     next();
     return;
   }
-  log.info('router:wrapAuthorizeSlack', 'Verification token invalid. Sending 400 Access denied.');
+  log.info(logPrefix, 'Verification token invalid. Sending 400 Access denied.');
   res.status(400).send('Access denied.');
 }
 
@@ -75,33 +76,33 @@ router.post('/command', commandHandler);
 // Authorization When Teams Install the Slack App //
 ////////////////////////////////////////////////////
 
-function authorizationGrantHandler(error, response, body) {
+function authorizationGrantHandler(broker, error, response, body) {
   if (error) {
-    log.error('router', error);
+    log.error(logPrefix, error);
   }
   const bodyObject = JSON.parse(body);
-  log.info('router', `A team called ${bodyObject.team_name} just installed the app.`);
+  log.info(logPrefix, `A team called ${bodyObject.team_name} just installed the app.`);
   // Do the things we want to do when a team initially installs our app
-  //bot.startListening(bodyObject.bot.bot_access_token, bodyObject.team_name);
+  bot.startListening(bodyObject.bot.bot_access_token, bodyObject.team_name, broker);
 }
 
-function getAuthorizationGrant(code) {
-  log.info('router', 'Getting authorization grant.');
+function getAuthorizationGrant(req) {
+  log.info(logPrefix, 'Getting authorization grant.');
   const postConfig = {
     url: 'https://slack.com/api/oauth.access',
     form: {
       client_id: config.SLACK_CLIENT_ID,
       client_secret: config.SLACK_CLIENT_SECRET,
-      code
+      code: req.query.code
     }
   };
-  request.post(postConfig, authorizationGrantHandler);
+  request.post(postConfig, authorizationGrantHandler.bind(null, req.broker));
 }
 
 function authorizationHandler(req, res) {
-  log.info('router', 'A team is installing the app.');
+  log.info(logPrefix, 'A team is installing the app.');
   if (req.query.code) {
-    getAuthorizationGrant(req.query.code);
+    getAuthorizationGrant(req);
     res.sendStatus(200);
   } else {
     res.status(400);
