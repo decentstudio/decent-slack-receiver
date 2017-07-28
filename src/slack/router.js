@@ -76,14 +76,17 @@ router.post('/command', commandHandler);
 // Authorization When Teams Install the Slack App //
 ////////////////////////////////////////////////////
 
-function authorizationGrantHandler(broker, error, response, body) {
-  if (error) {
-    log.error(logPrefix, error);
+router.get('/authorize', authorizationHandler);
+
+function authorizationHandler(req, res) {
+  log.info(logPrefix, 'A team is installing the app.');
+  if (req.query.code) {
+    getAuthorizationGrant(req);
+    res.sendStatus(200);
+  } else {
+    res.status(400);
+    res.send('code not included in query string');
   }
-  const bodyObject = JSON.parse(body);
-  log.info(logPrefix, `A team called ${bodyObject.team_name} just installed the app.`);
-  // Do the things we want to do when a team initially installs our app
-  bot.startListening(bodyObject.bot.bot_access_token, bodyObject.team_name, broker);
 }
 
 function getAuthorizationGrant(req) {
@@ -99,17 +102,14 @@ function getAuthorizationGrant(req) {
   request.post(postConfig, authorizationGrantHandler.bind(null, req.broker));
 }
 
-function authorizationHandler(req, res) {
-  log.info(logPrefix, 'A team is installing the app.');
-  if (req.query.code) {
-    getAuthorizationGrant(req);
-    res.sendStatus(200);
-  } else {
-    res.status(400);
-    res.send('code not included in query string');
+function authorizationGrantHandler(broker, error, response, body) {
+  if (error) {
+    log.error(logPrefix, error);
   }
+  const bodyObject = JSON.parse(body);
+  // Do the things we want to do when a team initially installs our app
+  broker.publish('slack.auth.grant', body);
+  bot.startListening(bodyObject.bot.bot_access_token, bodyObject.team_name, broker);
 }
-
-router.get('/authorize', authorizationHandler);
 
 export default router;
