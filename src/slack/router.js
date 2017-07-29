@@ -2,7 +2,7 @@ import express from 'express';
 import log from 'npmlog';
 import config from '../config';
 import bodyParser from 'body-parser';
-import request from 'request';
+import rp from 'request-promise';
 import bot from './bot';
 
 const router = express.Router(),
@@ -76,13 +76,19 @@ router.post('/command', commandHandler);
 // Authorization When Teams Install the Slack App //
 ////////////////////////////////////////////////////
 
-router.get('/authorize', authorizationHandler);
+router.get('/authorize', handleAuthorization);
 
-function authorizationHandler(req, res) {
+function handleAuthorization(req, res) {
   log.info(logPrefix, 'A team is installing the app.');
   if (req.query.code) {
-    getAuthorizationGrant(req);
-    res.sendStatus(200);
+    getAuthorizationGrant(req)
+      .then((authGrant) => {
+        return Promise.all([
+          publishAuthGrantToExchange({ authGrant, broker: req.broker }),
+          startBotListening({ authGrant, broker: req.broker })
+        ])
+      })
+      .then(() => res.sendStatus(200));
   } else {
     res.status(400);
     res.send('code not included in query string');
@@ -99,17 +105,17 @@ function getAuthorizationGrant(req) {
       code: req.query.code
     }
   };
-  request.post(postConfig, authorizationGrantHandler.bind(null, req.broker));
+  return rp.post(postConfig);
 }
 
-function authorizationGrantHandler(broker, error, response, body) {
-  if (error) {
-    log.error(logPrefix, error);
-  }
-  const bodyObject = JSON.parse(body);
-  // Do the things we want to do when a team initially installs our app
-  broker.publish('slack.auth.grant', body);
-  bot.startListening(bodyObject.bot.bot_access_token, bodyObject.team_name, broker);
+function publishAuthGrantToExchange({ authGrant, broker }) {
+  broker.publish('slack.auth.grant', authGrant);
+  return Promise.resolve({ authGrant, broker });
+}
+
+function startBotListening({ authGrant, broker }) {
+  bot.startListening({ authGrant, broker });
+  return Promise.resolve();
 }
 
 export default router;

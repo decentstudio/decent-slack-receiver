@@ -9,7 +9,7 @@
     "express": "^4.15.3",
     "immutable": "^3.8.1",
     "npmlog": "^4.1.0",
-    "request": "^2.81.0"
+    "request-promise": "^4.2.1"
   },
   "watch": {
     "build-start": "src/**/*.js"
