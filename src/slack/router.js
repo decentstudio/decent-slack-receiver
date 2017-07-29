@@ -110,7 +110,7 @@ function getAuthorizationGrant(req) {
 
 function publishAuthGrantToExchange({ authGrant, broker }) {
   broker.publish('slack.auth.grant', authGrant);
-  return Promise.resolve({ authGrant, broker });
+  return Promise.resolve();
 }
 
 function startBotListening({ authGrant, broker }) {
