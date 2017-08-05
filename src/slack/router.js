@@ -4,13 +4,7 @@ import config from '../config';
 import bodyParser from 'body-parser';
 import rp from 'request-promise';
 import bot from './bot';
-import NodeCouchDb from 'node-couchdb';
-
-const dbName = 'decent-news';
-const couch = new NodeCouchDb();
-couch.createDatabase(dbName)
-  .then(() => console.log('Database created successfully'),
-  (error) => { });
+import db from '../db';
 
 const router = express.Router(),
   slackVerificationToken = config.SLACK_VERIFICATION_TOKEN,
@@ -94,7 +88,7 @@ function handleAuthorization(req, res) {
         log.info('Received auth grant:', authGrant);
         bot.startListening({ authGrant, broker: req.broker });
         log.info(`Bot listening to new messages from ${authGrant.team_name}`);
-        return saveToDb(authGrant);
+        return db.add('authGrant', authGrant);
       })
       .then(() => res.sendStatus(200))
       .catch(() => {
@@ -117,25 +111,6 @@ function getAuthorizationGrant(req) {
     }
   };
   return rp.post(postConfig);
-}
-
-function saveToDb(authGrant) {
-  log.info('Saving auth grant to couchdb');
-  log.info('Type of authGrant:', typeof authGrant);
-  return couch.uniqid()
-    .then(ids => {
-      return couch.insert(dbName, {
-        _id: ids[0],
-        authGrant
-      });
-    })
-    .then(({ data, headers, statuses }) => {
-      console.log('Document inserted:', data);
-      return Promise.resolve();
-    }, err => {
-      console.log('Error inserting document:', err);
-      return Promise.reject();
-    });
 }
 
 export default router;

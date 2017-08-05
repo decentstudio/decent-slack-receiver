@@ -1,9 +1,3 @@
-// server.js
-
-// BASE SETUP
-// =============================================================================
-
-// call the packages we need
 import config from './config';
 import broker from './broker';
 import slackRouter from './slack/router';
