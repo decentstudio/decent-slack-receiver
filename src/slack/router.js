@@ -4,6 +4,13 @@ import config from '../config';
 import bodyParser from 'body-parser';
 import rp from 'request-promise';
 import bot from './bot';
+import NodeCouchDb from 'node-couchdb';
+
+const dbName = 'decent-news';
+const couch = new NodeCouchDb();
+couch.createDatabase(dbName)
+  .then(() => console.log('Database created successfully'),
+  (error) => { });
 
 const router = express.Router(),
   slackVerificationToken = config.SLACK_VERIFICATION_TOKEN,
@@ -82,13 +89,17 @@ function handleAuthorization(req, res) {
   log.info(logPrefix, 'A team is installing the app.');
   if (req.query.code) {
     getAuthorizationGrant(req)
-      .then((authGrant) => {
-        return Promise.all([
-          publishAuthGrantToExchange({ authGrant, broker: req.broker }),
-          startBotListening({ authGrant, broker: req.broker })
-        ])
+      .then((authGrantString) => {
+        const authGrant = JSON.parse(authGrantString);
+        log.info('Received auth grant:', authGrant);
+        bot.startListening({ authGrant, broker: req.broker });
+        log.info(`Bot listening to new messages from ${authGrant.team_name}`);
+        return saveToDb(authGrant);
       })
-      .then(() => res.sendStatus(200));
+      .then(() => res.sendStatus(200))
+      .catch(() => {
+        res.sendStatus(500);
+      });
   } else {
     res.status(400);
     res.send('code not included in query string');
@@ -108,14 +119,23 @@ function getAuthorizationGrant(req) {
   return rp.post(postConfig);
 }
 
-function publishAuthGrantToExchange({ authGrant, broker }) {
-  broker.publish('slack.auth.grant', authGrant);
-  return Promise.resolve();
-}
-
-function startBotListening({ authGrant, broker }) {
-  bot.startListening({ authGrant, broker });
-  return Promise.resolve();
+function saveToDb(authGrant) {
+  log.info('Saving auth grant to couchdb');
+  log.info('Type of authGrant:', typeof authGrant);
+  return couch.uniqid()
+    .then(ids => {
+      return couch.insert(dbName, {
+        _id: ids[0],
+        authGrant
+      });
+    })
+    .then(({ data, headers, statuses }) => {
+      console.log('Document inserted:', data);
+      return Promise.resolve();
+    }, err => {
+      console.log('Error inserting document:', err);
+      return Promise.reject();
+    });
 }
 
 export default router;
